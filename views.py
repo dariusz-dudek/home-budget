@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from terminaltables import AsciiTable
 
 
 class AbstractView(ABC):
@@ -19,12 +20,19 @@ class AddCost(AbstractView):
 
     def draw(self):
         print(AddCost.LABEL)
-        title = input('Tytuł: ')
-        category_name = input('Kategoria: ')
+        name = input('Tytuł: ')
         amount = float(input('Wartość: '))
 
-        category = self.repositories['category'].get_by_name(category_name)
-        self.repositories['entry'].save(title, category, amount)
+        found_category = False
+        while not found_category:
+            try:
+                category_name = input('Kategoria: ')
+                category_id, _ = self.repositories['category'].get_by_name(category_name)
+                found_category = True
+            except TypeError:
+                found_category = False
+
+        self.repositories['entry'].save(name, category_id, amount * -1)
 
 
 class ListCost(AbstractView):
@@ -33,6 +41,14 @@ class ListCost(AbstractView):
 
     def draw(self):
         print(ListCost.LABEL)
+        rows = [
+            ['Data dodania', 'Kwota', 'Kategoria']
+        ]
+        for _, created_at, amount, category in self.repositories['entry'].get_costs():
+            rows.append([created_at, amount, category])
+
+        table = AsciiTable(rows)
+        print(table.table)
 
 
 class AddIncome(AbstractView):

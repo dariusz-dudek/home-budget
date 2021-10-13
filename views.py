@@ -67,12 +67,33 @@ class ListIncomes(AbstractView):
         print(ListIncomes.LABEL)
 
 
+class Raport(AbstractView):
+    SHORTCUT = 'r'
+    LABEL = 'Raporty'
+
+    def draw(self):
+        print(Raport.LABEL)
+        repository = self.repositories['raport']
+
+        quantity, saldo = repository.get_saldo()
+
+        # print(f'Ilość operacji: {quantity} ')
+        # print(f'Saldo: {saldo}')
+
+        rows = [('Nazwa', 'Ilość', 'Saldo')]
+        rows += repository.get_by_category()
+
+        table = AsciiTable(rows)
+        print(table.table)
+
+
 class MainMenu(AbstractView):
     OPTIONS = {
         AddCost.SHORTCUT: AddCost(),
         ListCost.SHORTCUT: ListCost(),
         AddIncome.SHORTCUT: AddIncome(),
-        ListIncomes.SHORTCUT: ListIncomes()
+        ListIncomes.SHORTCUT: ListIncomes(),
+        Raport.SHORTCUT: Raport()
     }
 
     def get_screen(self):

@@ -6,8 +6,18 @@ class EntryRepository:
         with sqlite3.connect('database.db') as connection:
             cursor = connection.cursor()
             cursor.execute(
-                '''select e.id, e.created_at, e.amount, c.name 
-                   from entry e left join category c on c.id = e.category_id order by created_at''')
+                '''SELECT e.id, e.name, e.created_at, e.amount, c.name 
+                   FROM entry e LEFT JOIN category c ON c.id = e.category_id 
+                   WHERE e.amount < 0 ORDER BY created_at''')
+            return cursor.fetchall()
+
+    def get_incomes(self):
+        with sqlite3.connect('database.db') as connection:
+            cursor = connection.cursor()
+            cursor.execute(
+                '''SELECT e.id, e.name, e.created_at, e.amount, c.name 
+                   FROM entry e LEFT JOIN category c ON c.id = e.category_id 
+                   WHERE e.amount > 0 ORDER BY created_at''')
             return cursor.fetchall()
 
     def save(self, name, category_id, amount):
